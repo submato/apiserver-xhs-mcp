@@ -1,7 +1,7 @@
 {
   "name": "apiserver-xhs-mcp",
-  "version": "0.1.0",
-  "description": "Remote MCP server for paid Xiaohongshu data APIs, including note search, details, comments, users, and user posts.",
+  "version": "0.2.0",
+  "description": "Remote MCP server for paid Xiaohongshu V2 data APIs, including note search, details, comments, users, and user posts.",
   "type": "module",
   "main": "dist/server.js",
   "files": [
@@ -24,6 +24,7 @@
     "model-context-protocol",
     "xiaohongshu",
     "xhs",
+    "xhs-v2",
     "rednote",
     "rednote-api",
     "social-media-api",

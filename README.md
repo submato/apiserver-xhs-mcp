@@ -8,7 +8,7 @@
 
 ![API Server Xiaohongshu MCP — paid RedNote data tools for AI agents](assets/social-preview.png)
 
-**API Server Xiaohongshu MCP is a remote Model Context Protocol gateway for paid Xiaohongshu (RedNote) data APIs.** It lets Cursor, Claude, and other MCP-compatible AI agents search notes, read note details and comments, find creators, and list user posts without custom API integration code.
+**API Server Xiaohongshu MCP is a remote Model Context Protocol gateway for paid Xiaohongshu (RedNote) V2 data APIs.** It lets Cursor, Claude, and other MCP-compatible AI agents search notes, read note details and comments, inspect creators, and list user posts without custom API integration code.
 
 The gateway does not replace API Server billing. Every request forwards the customer's API Server token to the existing API, so balances, subscriptions, token charges, and rate limits remain under API Server control.
 
@@ -34,17 +34,16 @@ The gateway does not replace API Server billing. Every request forwards the cust
 
 ## Available MCP tools
 
-- `xhs_search_notes` — search app notes with sorting and filters; 60 tokens
-- `xhs_get_note` — fetch an image/text note; 40 tokens
-- `xhs_get_video_note` — fetch a video-note feed response; 40 tokens
-- `xhs_get_comments` — fetch top-level note comments; 20 tokens
-- `xhs_get_subcomments` — fetch replies to a comment; 20 tokens
-- `xhs_search_users` — search app users; 60 tokens
-- `xhs_get_user` — fetch an app user profile; 50 tokens
-- `xhs_list_user_notes` — list notes published by a user; 40 tokens
-- `xhs_list_topic_notes` — list notes under a topic/tag; 20 tokens
+- `xhs_v2_search_notes` — search notes with sorting and filters; 60 tokens
+- `xhs_v2_get_note` — fetch an adapted note detail response; 45 tokens
+- `xhs_v2_get_full_note` — fetch the complete note detail response; 60 tokens
+- `xhs_v2_get_comments` — fetch and sort top-level comments; 45 tokens
+- `xhs_v2_get_subcomments` — fetch replies to a comment; 45 tokens
+- `xhs_v2_get_user` — fetch an adapted user profile; 45 tokens
+- `xhs_v2_get_full_user` — fetch the complete user profile; 60 tokens
+- `xhs_v2_list_user_notes` — list notes published by a user; 60 tokens
 
-The unrestricted X-S signing endpoint is intentionally not exposed as an MCP tool. Public agent tools should have narrow, auditable capabilities.
+Only `/api/xhs/v2/*` business endpoints are exposed. Legacy, V3, vendor-balance, and unrestricted X-S signing endpoints are intentionally excluded.
 
 ## How billing works
 

@@ -34,15 +34,14 @@ describe("createApiClient", () => {
       fetchImpl: fetchMock as typeof fetch,
     });
 
-    await client.get("/api/xhs/appsearch", {
+    await client.get("/api/xhs/v2/appsearch", {
       keyword: "露营 攻略",
       page: 1,
-      searchId: undefined,
     });
 
     const [url, init] = fetchMock.mock.calls[0]!;
     expect(String(url)).toBe(
-      "https://api.example.com/api/xhs/appsearch?keyword=%E9%9C%B2%E8%90%A5+%E6%94%BB%E7%95%A5&page=1",
+      "https://api.example.com/api/xhs/v2/appsearch?keyword=%E9%9C%B2%E8%90%A5+%E6%94%BB%E7%95%A5&page=1",
     );
     expect(init?.headers).toMatchObject({ Authorization: "Token customer-key" });
   });
@@ -56,7 +55,9 @@ describe("createApiClient", () => {
       fetchImpl: vi.fn(async () => new Response("insufficient balance", { status: 402 })),
     });
 
-    await expect(client.get("/api/xhs/notedetail", { noteId: "123" })).rejects.toEqual(
+    await expect(
+      client.get("/api/xhs/v2/notedetail", { noteId: "123" }),
+    ).rejects.toEqual(
       expect.objectContaining<ApiServerError>({
         status: 402,
       }),

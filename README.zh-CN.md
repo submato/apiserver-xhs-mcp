@@ -4,7 +4,7 @@
 
 ![API Server 小红书 MCP：面向 AI Agent 的付费 RedNote 数据工具](assets/social-preview.png)
 
-**API Server 小红书 MCP 是现有付费小红书数据接口的远程 Model Context Protocol 网关。** Cursor、Claude 和其他支持 MCP 的 AI Agent 可以直接搜索笔记、获取笔记详情与评论、搜索用户以及读取用户作品，不需要用户自己编写 API 调用代码。
+**API Server 小红书 MCP 是现有付费小红书 V2 数据接口的远程 Model Context Protocol 网关。** Cursor、Claude 和其他支持 MCP 的 AI Agent 可以直接搜索笔记、获取笔记详情与评论、读取用户资料以及用户作品，不需要用户自己编写 API 调用代码。
 
 MCP 不会取代 API Server 的商业系统。每次调用都会把客户自己的 API Server Token 转发给现有接口，继续由 API Server 处理余额、套餐、扣费和 QPS。
 
@@ -30,17 +30,16 @@ MCP 不会取代 API Server 的商业系统。每次调用都会把客户自己�
 
 ## MCP 工具
 
-- `xhs_search_notes`：搜索 App 笔记，支持排序与筛选；60 Token
-- `xhs_get_note`：获取图文笔记；40 Token
-- `xhs_get_video_note`：获取视频笔记 Feed；40 Token
-- `xhs_get_comments`：获取一级评论；20 Token
-- `xhs_get_subcomments`：获取评论回复；20 Token
-- `xhs_search_users`：搜索用户；60 Token
-- `xhs_get_user`：获取用户资料；50 Token
-- `xhs_list_user_notes`：获取用户发布的笔记；40 Token
-- `xhs_list_topic_notes`：获取话题标签下的笔记；20 Token
+- `xhs_v2_search_notes`：搜索笔记，支持排序与筛选；60 Token
+- `xhs_v2_get_note`：获取适配后的笔记详情；45 Token
+- `xhs_v2_get_full_note`：获取全参笔记详情；60 Token
+- `xhs_v2_get_comments`：获取一级评论，支持最新/最热排序；45 Token
+- `xhs_v2_get_subcomments`：获取评论回复；45 Token
+- `xhs_v2_get_user`：获取适配后的用户资料；45 Token
+- `xhs_v2_get_full_user`：获取全参用户资料；60 Token
+- `xhs_v2_list_user_notes`：获取用户发布的笔记；60 Token
 
-项目有意不公开能力范围过大的 X-S 通用签名接口。公开 Agent 工具应保持权限窄、参数明确、调用可审计。
+MCP 只开放 `/api/xhs/v2/*` 业务接口，不提供旧版、V3、厂商余额和 X-S 通用签名接口。
 
 ## 扣费流程
 

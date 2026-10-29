@@ -12,9 +12,34 @@ const readOnlyAnnotations = {
   openWorldHint: true,
 } as const;
 
+function normalizeV2Response(data: unknown): unknown {
+  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+    return data;
+  }
+
+  const response = data as Record<string, unknown>;
+  if (typeof response.data !== "string") {
+    return data;
+  }
+
+  try {
+    return { ...response, data: JSON.parse(response.data) };
+  } catch {
+    return data;
+  }
+}
+
 function result(data: unknown) {
+  const normalized = normalizeV2Response(data);
+  const isBusinessError =
+    typeof normalized === "object" &&
+    normalized !== null &&
+    "code" in normalized &&
+    (normalized as { code?: unknown }).code !== 0;
+
   return {
-    content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
+    content: [{ type: "text" as const, text: JSON.stringify(normalized, null, 2) }],
+    ...(isBusinessError ? { isError: true } : {}),
   };
 }
 
@@ -40,96 +65,94 @@ async function call(operation: () => Promise<unknown>) {
 
 export function registerXhsTools(server: McpServer, api: ApiClient): void {
   server.registerTool(
-    "xhs_search_notes",
+    "xhs_v2_search_notes",
     {
-      title: "Search Xiaohongshu notes",
+      title: "Search Xiaohongshu notes (V2)",
       description:
-        "Search Xiaohongshu (RedNote) app notes by keyword with sorting and filters. Costs 60 API Server tokens per call.",
+        "Search Xiaohongshu (RedNote) notes through API Server V2. Costs 60 API Server tokens per call.",
       inputSchema: {
         keyword: z.string().min(1).max(100).describe("Search keyword"),
         page: z.number().int().min(1).default(1).describe("Page number starting at 1"),
-        searchId: z.string().optional().describe("searchId returned by the previous page"),
-        sessionId: z.string().optional().describe("sessionId returned by the previous page"),
-        sortType: z
+        sort: z
           .enum([
-            "general",
-            "time_descending",
-            "popularity_descending",
-            "comment_descending",
-            "collect_descending",
+            "综合",
+            "最新",
+            "最多点赞",
+            "最多评论",
+            "最多收藏",
+            "英文优先",
           ])
-          .default("general"),
-        filterNoteType: z.enum(["不限", "视频笔记", "普通笔记"]).default("不限"),
-        filterNoteTime: z.enum(["不限", "一天内", "一周内", "半年内"]).default("不限"),
-        filterNoteRange: z.enum(["不限", "已看过", "未看过", "已关注"]).default("不限"),
+          .default("综合"),
+        noteType: z.enum(["不限", "视频笔记", "普通笔记"]).default("不限"),
+        noteTime: z
+          .enum(["不限", "一天内", "一周内", "一个月内", "一年内"])
+          .default("不限"),
       },
       annotations: readOnlyAnnotations,
     },
     async (input) =>
       call(() =>
-        api.get("/api/xhs/appsearch", {
+        api.get("/api/xhs/v2/appsearch", {
           keyword: input.keyword,
           page: input.page,
-          searchId: input.searchId,
-          sessionId: input.sessionId,
-          sortType: input.sortType,
-          filterNoteType: input.filterNoteType,
-          filterNoteTime: input.filterNoteTime,
-          filterNoteRange: input.filterNoteRange,
+          sort: input.sort,
+          note_type: input.noteType,
+          note_time: input.noteTime,
         }),
       ),
   );
 
   server.registerTool(
-    "xhs_get_note",
+    "xhs_v2_get_note",
     {
-      title: "Get Xiaohongshu note",
+      title: "Get Xiaohongshu note (V2)",
       description:
-        "Get details for a Xiaohongshu image/text note. Use xhs_get_video_note for video notes. Costs 40 API Server tokens.",
+        "Get an adapted Xiaohongshu note detail response through API Server V2. Costs 45 API Server tokens.",
       inputSchema: {
         noteId: z.string().min(1).describe("Xiaohongshu note ID"),
       },
       annotations: readOnlyAnnotations,
     },
-    async ({ noteId }) => call(() => api.get("/api/xhs/notedetail", { noteId })),
+    async ({ noteId }) => call(() => api.get("/api/xhs/v2/notedetail", { noteId })),
   );
 
   server.registerTool(
-    "xhs_get_video_note",
+    "xhs_v2_get_full_note",
     {
-      title: "Get Xiaohongshu video note",
+      title: "Get full Xiaohongshu note (V2)",
       description:
-        "Get the feed response for a Xiaohongshu video note. The first returned video is the requested note. Costs 40 API Server tokens.",
+        "Get the complete Xiaohongshu note detail response through API Server V2. Costs 60 API Server tokens.",
       inputSchema: {
-        noteId: z.string().min(1).describe("Xiaohongshu video note ID"),
+        noteId: z.string().min(1).describe("Xiaohongshu note ID"),
       },
       annotations: readOnlyAnnotations,
     },
-    async ({ noteId }) => call(() => api.get("/api/xhs/videonotedetail", { noteId })),
+    async ({ noteId }) => call(() => api.get("/api/xhs/v2/fullnotedetail", { noteId })),
   );
 
   server.registerTool(
-    "xhs_get_comments",
+    "xhs_v2_get_comments",
     {
-      title: "Get Xiaohongshu comments",
+      title: "Get Xiaohongshu comments (V2)",
       description:
-        "Get one page of top-level comments for a Xiaohongshu note. Costs 20 API Server tokens.",
+        "Get one page of top-level comments through API Server V2, optionally sorted by newest or hottest. Costs 45 tokens.",
       inputSchema: {
         noteId: z.string().min(1).describe("Xiaohongshu note ID"),
         start: z.string().optional().describe("Last comment ID from the previous page"),
+        sort: z.enum(["最新", "最热"]).optional().describe("Optional comment sort order"),
       },
       annotations: readOnlyAnnotations,
     },
-    async ({ noteId, start }) =>
-      call(() => api.get("/api/xhs/getcomment", { noteId, start })),
+    async ({ noteId, start, sort }) =>
+      call(() => api.get("/api/xhs/v2/getcomment", { noteId, start, sort })),
   );
 
   server.registerTool(
-    "xhs_get_subcomments",
+    "xhs_v2_get_subcomments",
     {
-      title: "Get Xiaohongshu subcomments",
+      title: "Get Xiaohongshu subcomments (V2)",
       description:
-        "Get one page of replies to a top-level Xiaohongshu comment. Costs 20 API Server tokens.",
+        "Get one page of replies to a top-level comment through API Server V2. Costs 45 API Server tokens.",
       inputSchema: {
         noteId: z.string().min(1).describe("Xiaohongshu note ID"),
         commentId: z.string().min(1).describe("Top-level comment ID"),
@@ -138,45 +161,46 @@ export function registerXhsTools(server: McpServer, api: ApiClient): void {
       annotations: readOnlyAnnotations,
     },
     async ({ noteId, commentId, start }) =>
-      call(() => api.get("/api/xhs/getsubcomments", { noteId, commentId, start })),
+      call(() =>
+        api.get("/api/xhs/v2/getsubcomments", { noteId, commentId, start }),
+      ),
   );
 
   server.registerTool(
-    "xhs_search_users",
+    "xhs_v2_get_user",
     {
-      title: "Search Xiaohongshu users",
+      title: "Get Xiaohongshu user (V2)",
       description:
-        "Search Xiaohongshu app users by keyword. Continue pagination with searchId. Costs 60 API Server tokens.",
-      inputSchema: {
-        keyword: z.string().min(1).max(100).describe("User search keyword"),
-        page: z.number().int().min(1).default(1),
-        searchId: z.string().optional().describe("searchId returned by the previous page"),
-      },
-      annotations: readOnlyAnnotations,
-    },
-    async ({ keyword, page, searchId }) =>
-      call(() => api.get("/api/xhs/appusersearch", { keyword, page, searchId })),
-  );
-
-  server.registerTool(
-    "xhs_get_user",
-    {
-      title: "Get Xiaohongshu user",
-      description: "Get a Xiaohongshu app user profile. Costs 50 API Server tokens.",
+        "Get an adapted Xiaohongshu user profile through API Server V2. Costs 45 API Server tokens.",
       inputSchema: {
         userId: z.string().min(1).describe("Xiaohongshu user ID"),
       },
       annotations: readOnlyAnnotations,
     },
-    async ({ userId }) => call(() => api.get("/api/xhs/appuserinfo", { userId })),
+    async ({ userId }) => call(() => api.get("/api/xhs/v2/appuserinfo", { userId })),
   );
 
   server.registerTool(
-    "xhs_list_user_notes",
+    "xhs_v2_get_full_user",
     {
-      title: "List Xiaohongshu user notes",
+      title: "Get full Xiaohongshu user (V2)",
       description:
-        "List notes published by a Xiaohongshu app user. Continue pagination with cursor. Costs 40 API Server tokens.",
+        "Get a complete Xiaohongshu user profile through API Server V2. Costs 60 API Server tokens.",
+      inputSchema: {
+        userId: z.string().min(1).describe("Xiaohongshu user ID"),
+      },
+      annotations: readOnlyAnnotations,
+    },
+    async ({ userId }) =>
+      call(() => api.get("/api/xhs/v2/fulluserinfo", { userId })),
+  );
+
+  server.registerTool(
+    "xhs_v2_list_user_notes",
+    {
+      title: "List Xiaohongshu user notes (V2)",
+      description:
+        "List notes published by a Xiaohongshu user through API Server V2. Continue pagination with cursor. Costs 60 tokens.",
       inputSchema: {
         userId: z.string().min(1).describe("Xiaohongshu user ID"),
         cursor: z.string().optional().describe("Cursor returned by the previous page"),
@@ -184,29 +208,6 @@ export function registerXhsTools(server: McpServer, api: ApiClient): void {
       annotations: readOnlyAnnotations,
     },
     async ({ userId, cursor }) =>
-      call(() => api.get("/api/xhs/appuserposted", { userId, cursor })),
-  );
-
-  server.registerTool(
-    "xhs_list_topic_notes",
-    {
-      title: "List Xiaohongshu topic notes",
-      description:
-        "List notes under a Xiaohongshu topic/tag with pagination fields from the previous response. Costs 20 API Server tokens.",
-      inputSchema: {
-        pageId: z.string().min(1).describe("Topic/tag ID"),
-        first_load_time: z
-          .string()
-          .min(1)
-          .describe("First request time as a millisecond Unix timestamp"),
-        sort: z.enum(["hot", "time", "trend"]).default("hot"),
-        session_id: z.string().optional(),
-        last_note_ct: z.string().optional(),
-        last_note_id: z.string().optional(),
-        cursor_score: z.string().optional(),
-      },
-      annotations: readOnlyAnnotations,
-    },
-    async (input) => call(() => api.get("/api/xhs/tagnotes", input)),
+      call(() => api.get("/api/xhs/v2/appuserposted", { userId, cursor })),
   );
 }
