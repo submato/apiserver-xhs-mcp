@@ -60,8 +60,10 @@ The token is read from the HTTP header and is never part of a tool's arguments, 
 ### Requirements
 
 - Node.js 20 or newer
-- An API Server base URL
+- The production API Server base URL: `https://dataflowserver.org`
 - A customer API Server token for testing tool calls
+
+See the [XHS V2 API documentation](https://dataflowserver.org/api/docs/) for account access, endpoint details, and current billing behavior.
 
 ```bash
 git clone https://github.com/submato/apiserver-xhs-mcp.git

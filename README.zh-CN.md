@@ -56,8 +56,10 @@ Token 不会出现在 MCP 工具参数中，因此模型无需读取或传递客
 环境要求：
 
 - Node.js 20+
-- API Server 服务地址
+- API Server 正式地址：`https://dataflowserver.org`
 - 用于测试真实调用的 API Server Token
+
+账号接入、接口参数和当前计费规则请查看 [XHS V2 在线接口文档](https://dataflowserver.org/api/docs/)。
 
 ```bash
 git clone https://github.com/submato/apiserver-xhs-mcp.git
