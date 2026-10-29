@@ -18,6 +18,28 @@
 
 > DataFlow 是独立的第三方数据接口服务，与小红书没有隶属或官方合作关系。请依法合规使用数据。
 
+## 直接让 AI 配置
+
+把下面这段话复制给 Cursor、Claude Code 或其他能操作终端和配置文件的 AI：
+
+```text
+请帮我安装并配置这个小红书 MCP：
+https://github.com/submato/apiserver-xhs-mcp
+
+请自动完成以下操作：
+1. 克隆仓库并安装依赖。
+2. 复制 .env.example 为 .env，保持 APISERVER_BASE_URL=https://dataflowserver.org。
+3. 构建并启动 MCP 服务。
+4. 把 http://localhost:3000/mcp 添加到我当前使用的 MCP 客户端配置中。
+5. Authorization 请求头使用 Bearer YOUR_DATAFLOW_TOKEN。
+6. 检查 /health，并确认 MCP 工具能够正常加载。
+
+不要让我提供小红书账号、密码、Cookie 或验证码。
+先使用 YOUR_DATAFLOW_TOKEN 占位，配置完成后提醒我在本地手动替换成自己的 DataFlow Token，不要读取或输出我的真实 Token。
+```
+
+DataFlow Token 可在[登录并充值](https://dataflowserver.org/login/)后获取。接口参数和价格请查看 [Apifox 文档](https://dataflow.apifox.cn/)。
+
 ## 如何使用
 
 ### 1. 获取 DataFlow Token
