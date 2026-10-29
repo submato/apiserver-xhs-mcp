@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">API Server Xiaohongshu MCP</title>
+  <desc id="desc">Paid RedNote data tools for AI agents</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B1020"/>
+      <stop offset="1" stop-color="#151B34"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF3B68"/>
+      <stop offset="1" stop-color="#FF7A45"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="28"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="640" rx="32" fill="url(#bg)"/>
+  <circle cx="1080" cy="110" r="170" fill="#FF3B68" opacity=".15" filter="url(#glow)"/>
+  <circle cx="1130" cy="520" r="220" fill="#6945FF" opacity=".16" filter="url(#glow)"/>
+  <g transform="translate(86 94)">
+    <rect width="184" height="42" rx="21" fill="#222A49"/>
+    <circle cx="24" cy="21" r="7" fill="#58E0B8"/>
+    <text x="42" y="28" fill="#D7DEF7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">API SERVER</text>
+    <text x="0" y="145" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="76" font-weight="800">Xiaohongshu MCP</text>
+    <text x="0" y="204" fill="#AEB8DE" font-family="Inter, Arial, sans-serif" font-size="29" font-weight="500">Paid RedNote data tools for AI agents</text>
+    <rect y="264" width="532" height="4" rx="2" fill="url(#accent)"/>
+    <text x="0" y="326" fill="#D7DEF7" font-family="Inter, Arial, sans-serif" font-size="23">Search / Notes / Comments / Creators</text>
+    <text x="0" y="374" fill="#7F8AB4" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20">Streamable HTTP  /mcp</text>
+  </g>
+  <g transform="translate(870 216)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M110 25 L220 88 L220 214 L110 277 L0 214 L0 88 Z" stroke="#3A456F" stroke-width="4"/>
+    <path d="M110 25 L110 151 L220 214 M110 151 L0 214 M110 151 L220 88 M110 151 L0 88" stroke="#59658F" stroke-width="3"/>
+    <circle cx="110" cy="25" r="18" fill="#FF3B68" stroke="#FF9AB0" stroke-width="4"/>
+    <circle cx="220" cy="88" r="18" fill="#FF7A45" stroke="#FFB092" stroke-width="4"/>
+    <circle cx="220" cy="214" r="18" fill="#6945FF" stroke="#A998FF" stroke-width="4"/>
+    <circle cx="110" cy="277" r="18" fill="#58E0B8" stroke="#A3F3DB" stroke-width="4"/>
+    <circle cx="0" cy="214" r="18" fill="#6945FF" stroke="#A998FF" stroke-width="4"/>
+    <circle cx="0" cy="88" r="18" fill="#FF7A45" stroke="#FFB092" stroke-width="4"/>
+    <circle cx="110" cy="151" r="34" fill="url(#accent)" stroke="#FFB0BF" stroke-width="5"/>
+  </g>
+</svg>
